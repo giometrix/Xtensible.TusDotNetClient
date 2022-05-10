@@ -5,7 +5,7 @@ This is a fork of [TusDotNetClient](https://github.com/jonstodle/TusDotNetClient
 
 ## Features
 - Supports tus v1.0.0
-- Protocol extensions supported: Creation, Termination
+- Protocol extensions supported: Creation, Termination, Checksum Verification
 - Upload progress events
 
 ## Usage
