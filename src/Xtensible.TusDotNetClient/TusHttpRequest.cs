@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace TusDotNetClient
+namespace Xtensible.TusDotNetClient
 {
     /// <summary>
     /// HTTP methods supported by <see cref="TusDotNetClient"/>

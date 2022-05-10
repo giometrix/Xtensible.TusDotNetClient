@@ -9,15 +9,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TusDotNetClient
+namespace Xtensible.TusDotNetClient
 {
     /// <summary>
-    /// Represents the different hashing algorithm implementations supported by <see cref="TusClient"/>
+    /// Represents the different checksum hashing algorithm implementations supported by <see cref="TusClient"/>
     /// </summary>
-    public enum HashingImplementation
+    public enum ChecksumHashAlgorithmType
     {
-        Sha1Managed,
-        SHA1CryptoServiceProvider,
+        None,
+        Sha1,
+        Md5
     }
     
     /// <summary>
@@ -25,11 +26,27 @@ namespace TusDotNetClient
     /// </summary>
     public class TusClient
     {
-        /// <summary>
-        /// Get or set the hashing algorithm implementation to be used for checksum calculation.
-        /// </summary>
-        public static HashingImplementation HashingImplementation { get; set; } =
-            HashingImplementation.Sha1Managed;
+        private readonly ChecksumHashAlgorithmType _checksumHashAlgorithmType;
+        private readonly HashAlgorithm _hashAlgorithm;
+
+        public TusClient(ChecksumHashAlgorithmType checksumHashAlgorithmType = ChecksumHashAlgorithmType.None)
+        {
+            _checksumHashAlgorithmType = checksumHashAlgorithmType;
+            switch (checksumHashAlgorithmType)
+            {
+                case ChecksumHashAlgorithmType.None:
+                    _hashAlgorithm = null;
+                    break;
+                case ChecksumHashAlgorithmType.Sha1:
+                    _hashAlgorithm = SHA1.Create();
+                    break;
+                case ChecksumHashAlgorithmType.Md5:
+                    _hashAlgorithm = MD5.Create();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(checksumHashAlgorithmType), checksumHashAlgorithmType, null);
+            }
+        }
         
         /// <summary>
         /// A mutable dictionary of headers which will be included with all requests.
@@ -160,10 +177,7 @@ namespace TusDotNetClient
                             .ConfigureAwait(false);
 
                         var client = new TusHttpClient();
-                        var sha = HashingImplementation == HashingImplementation.Sha1Managed
-                            ? (SHA1) new SHA1Managed()
-                            : new SHA1CryptoServiceProvider();
-
+  
                         var uploadChunkSize = ChunkSizeToMB(chunkSize);
 
                         if (offset == fileStream.Length)
@@ -182,13 +196,20 @@ namespace TusDotNetClient
 
                             var bytesRead = await fileStream.ReadAsync(buffer, 0, uploadChunkSize);
                             var segment = new ArraySegment<byte>(buffer, 0, bytesRead);
-                            var sha1Hash = sha.ComputeHash(buffer, 0, bytesRead);
+                           
 
                             var request = new TusHttpRequest(url, RequestMethod.Patch, AdditionalHeaders, segment,
                                 cancellationToken);
                             request.AddHeader(TusHeaderNames.UploadOffset, offset.ToString());
-                            request.AddHeader(TusHeaderNames.UploadChecksum,
-                                $"sha1 {Convert.ToBase64String(sha1Hash)}");
+                            if (_checksumHashAlgorithmType != ChecksumHashAlgorithmType.None)
+                            {
+                                var algoName = _checksumHashAlgorithmType == ChecksumHashAlgorithmType.Sha1 ? "sha1" : "md5";
+
+                                var checksum = _hashAlgorithm.ComputeHash(buffer, 0, bytesRead);
+                                request.AddHeader(TusHeaderNames.UploadChecksum,
+                                    $"{algoName} {Convert.ToBase64String(checksum)}");
+                            }
+                            
                             request.AddHeader(TusHeaderNames.ContentType, "application/offset+octet-stream");
 
                             try

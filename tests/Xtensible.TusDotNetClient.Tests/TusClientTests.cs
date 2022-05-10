@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Shouldly;
-using TusDotNetClient;
+using Xtensible.TusDotNetClient;
 using Xunit;
 using static TusDotNetClientTests.Utils;
 

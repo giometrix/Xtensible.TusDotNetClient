@@ -1,4 +1,4 @@
-namespace TusDotNetClient
+namespace Xtensible.TusDotNetClient
 {
     /// <summary>
     /// A collection of the header names used by the Tus protocol.

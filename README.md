@@ -1,5 +1,7 @@
-# TusDotNetClient
+# Xtensible.TusDotNetClient
 .Net client for [tus.io](http://tus.io/) Resumable File Upload protocol.
+
+This is a fork of [TusDotNetClient](https://github.com/jonstodle/TusDotNetClient).  This fork adds additional features such as more checksum options.
 
 ## Features
 - Supports tus v1.0.0

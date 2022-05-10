@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace TusDotNetClient
+namespace Xtensible.TusDotNetClient
 {
     /// <summary>
     /// Represents information about a Tus enabled server.
