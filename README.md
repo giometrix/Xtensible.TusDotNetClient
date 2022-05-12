@@ -1,4 +1,6 @@
 # Xtensible.TusDotNetClient
+[![Nuget](https://img.shields.io/nuget/v/Xtensible.TusDotNetClient)](https://www.nuget.org/packages/Xtensible.TusDotNetClient/)
+
 .Net client for [tus.io](http://tus.io/) Resumable File Upload protocol.
 
 This is a fork of [TusDotNetClient](https://github.com/jonstodle/TusDotNetClient).  This fork adds additional features such as more checksum options.
